@@ -364,6 +364,118 @@ export default function Home() {
         </div>
       )}
 
+      {/* SEO Content Section */}
+      {!videoInfo && (
+        <section className="w-full max-w-2xl mt-8 space-y-8">
+          {/* How it works */}
+          <div className="rounded-2xl border border-border bg-bg-card p-6">
+            <h2 className="text-lg font-semibold mb-4 text-text-primary">
+              How It Works
+            </h2>
+            <div className="grid sm:grid-cols-3 gap-4 text-sm">
+              <div className="space-y-1">
+                <div className="text-accent font-semibold">1. Paste URL</div>
+                <p className="text-text-muted">
+                  Copy any YouTube video link and paste it above.
+                </p>
+              </div>
+              <div className="space-y-1">
+                <div className="text-accent font-semibold">2. Pick Format</div>
+                <p className="text-text-muted">
+                  Choose MP3, WAV, FLAC, AAC, OGG, Opus, or original quality.
+                </p>
+              </div>
+              <div className="space-y-1">
+                <div className="text-accent font-semibold">3. Download</div>
+                <p className="text-text-muted">
+                  Audio is extracted directly — no video conversion needed.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="rounded-2xl border border-border bg-bg-card p-6">
+            <h2 className="text-lg font-semibold mb-4 text-text-primary">
+              Features
+            </h2>
+            <ul className="grid sm:grid-cols-2 gap-3 text-sm text-text-secondary">
+              <li className="flex items-start gap-2">
+                <span className="text-accent mt-0.5">&#10003;</span>
+                <span>Direct audio stream extraction — no video downloaded</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent mt-0.5">&#10003;</span>
+                <span>8 output formats including lossless FLAC and WAV</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent mt-0.5">&#10003;</span>
+                <span>Handles long videos — 5+ hours, no problem</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent mt-0.5">&#10003;</span>
+                <span>Original quality option — zero re-encoding</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent mt-0.5">&#10003;</span>
+                <span>Free to use — no sign-up required</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent mt-0.5">&#10003;</span>
+                <span>High-quality MP3 encoding (best VBR setting)</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* FAQ for SEO */}
+          <div className="rounded-2xl border border-border bg-bg-card p-6">
+            <h2 className="text-lg font-semibold mb-4 text-text-primary">
+              Frequently Asked Questions
+            </h2>
+            <div className="space-y-4 text-sm">
+              <details className="group">
+                <summary className="cursor-pointer font-medium text-text-primary hover:text-accent transition-colors">
+                  What audio formats are supported?
+                </summary>
+                <p className="mt-2 text-text-muted pl-1">
+                  MP3, WAV, FLAC, AAC, M4A, OGG (Vorbis), Opus, and the original
+                  native stream from YouTube (typically Opus or AAC) with zero
+                  re-encoding.
+                </p>
+              </details>
+              <details className="group">
+                <summary className="cursor-pointer font-medium text-text-primary hover:text-accent transition-colors">
+                  Can I download audio from very long videos?
+                </summary>
+                <p className="mt-2 text-text-muted pl-1">
+                  Yes. The server is configured with extended timeouts specifically
+                  for long-duration content. Videos of 5+ hours work reliably.
+                </p>
+              </details>
+              <details className="group">
+                <summary className="cursor-pointer font-medium text-text-primary hover:text-accent transition-colors">
+                  Is the audio quality preserved?
+                </summary>
+                <p className="mt-2 text-text-muted pl-1">
+                  Audio is extracted directly from YouTube&apos;s audio-only DASH
+                  stream — no video data is ever downloaded. Choose &ldquo;Original&rdquo;
+                  format for zero re-encoding, or MP3/FLAC for the highest quality
+                  conversion available.
+                </p>
+              </details>
+              <details className="group">
+                <summary className="cursor-pointer font-medium text-text-primary hover:text-accent transition-colors">
+                  Is this tool free?
+                </summary>
+                <p className="mt-2 text-text-muted pl-1">
+                  Yes, completely free with no account required.
+                </p>
+              </details>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer className="mt-auto pt-12 pb-6 text-center text-text-muted text-xs">
         <p>
