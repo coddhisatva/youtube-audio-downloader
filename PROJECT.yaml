@@ -1,0 +1,57 @@
+# YouTube Audio Downloader - Project Status
+# This file auto-syncs with ~/ai_dev_hub/software_projects/PROJECTS.yaml
+
+project:
+  name: "YouTube Audio Downloader"
+  path: "~/youtube_audio_dwnldr_ext"
+  repo: "https://github.com/yourusername/youtube_audio_dwnldr_ext"  # Update if applicable
+  status: "active"  # Options: active, broken, deprecated, maintenance
+  deployed_url: "https://ytaudio-dl.vercel.app"
+
+description: |
+  Web app for extracting high-quality audio from YouTube videos.
+  Architecture: Next.js frontend (Vercel) + Python/Flask backend (Google Cloud Run).
+
+issues:
+  - id: 1
+    title: "YouTube bot detection blocking downloads"
+    severity: critical  # Options: critical, high, medium, low
+    status: resolved  # Options: open, in-progress, blocked, resolved
+    resolved: "2026-08-24"
+    created: "2026-04-06"
+
+    description: |
+      YouTube now requires authentication cookies to bypass bot detection.
+      The site is currently non-functional for all users until cookies are uploaded.
+
+    solution: |
+      Export cookies from browser and upload to Cloud Run backend:
+
+      1. Install browser extension:
+         https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+
+      2. Go to youtube.com (must be logged in)
+
+      3. Click extension icon → "Export" → saves cookies.txt to Downloads
+
+      4. Upload cookies to backend:
+         cd ~/youtube_audio_dwnldr_ext
+         ./upload_cookies.sh ~/Downloads/cookies.txt
+
+      5. Verify it works:
+         curl https://yt-audio-api-1055001435382.us-central1.run.app/api/health
+         # Should show "cookies_loaded": true
+
+    notes: |
+      - 2026-08-24: verified working end to end WITHOUT cookies. /api/health reports
+        cookies_loaded=false, yet /api/info returns metadata and /api/download returned a
+        real 6.4 MB MP3 for a test video. YouTube is no longer blocking the Cloud Run IP.
+        Treat this as "unblocked for now", not permanently fixed - bot detection has
+        flipped on and off before, so if it breaks again the cookie upload below is the fix.
+      - Cookies expire after 1-2 months and need to be re-exported
+      - The document.cookie method doesn't work (can't access httpOnly cookies)
+      - Mobile client workaround (ios/android) also blocked by YouTube as of April 2026
+
+tech_debt: []
+
+future_features: []
