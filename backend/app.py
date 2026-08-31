@@ -9,6 +9,7 @@ import re
 import shutil
 import tempfile
 import logging
+import json
 
 from flask import Flask, request, jsonify, Response, send_file
 from flask_cors import CORS
@@ -26,6 +27,35 @@ CORS(app, resources={r"/api/*": {"origins": ALLOWED_ORIGINS.split(",")}})
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Path to optional cookies file for YouTube authentication
+# Export from your browser using "Get cookies.txt" extension
+# Place at /app/cookies.txt in the Docker container
+COOKIES_FILE = os.environ.get("COOKIES_FILE", "/app/cookies.txt")
+
+# Common yt-dlp options to avoid bot detection
+def get_base_ydl_opts() -> dict:
+    """Return base yt-dlp options with anti-bot-detection settings."""
+    opts: dict = {
+        "quiet": True,
+        "no_warnings": True,
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["ios", "android", "web"],
+                "player_skip": ["webpage", "configs"],
+            }
+        },
+        "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+    }
+    # Use cookies file if it exists
+    if os.path.isfile(COOKIES_FILE):
+        opts["cookiefile"] = COOKIES_FILE
+        logger.info("Using cookies file: %s", COOKIES_FILE)
+    return opts
+
 
 SUPPORTED_FORMATS = {
     "mp3":      {"postprocessor": "mp3",    "content_type": "audio/mpeg"},
@@ -64,7 +94,36 @@ def format_duration(seconds: int) -> str:
 @app.route("/api/health", methods=["GET"])
 def health():
     """Health check endpoint."""
-    return jsonify({"status": "ok"})
+    has_cookies = os.path.isfile(COOKIES_FILE)
+    return jsonify({"status": "ok", "cookies_loaded": has_cookies})
+
+
+@app.route("/api/cookies", methods=["POST"])
+def upload_cookies():
+    """
+    Upload a Netscape-format cookies.txt file.
+    Expects multipart form data with a 'file' field,
+    or raw text body with the cookies content.
+    """
+    admin_key = os.environ.get("ADMIN_KEY", "")
+    provided_key = request.headers.get("X-Admin-Key", "")
+    if admin_key and provided_key != admin_key:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        if request.files and "file" in request.files:
+            request.files["file"].save(COOKIES_FILE)
+        elif request.data:
+            with open(COOKIES_FILE, "wb") as f:
+                f.write(request.data)
+        else:
+            return jsonify({"error": "No cookie data provided"}), 400
+
+        logger.info("Cookies file uploaded successfully")
+        return jsonify({"status": "ok", "message": "Cookies uploaded"})
+    except Exception as e:
+        logger.exception("Failed to upload cookies")
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/info", methods=["GET"])
@@ -75,11 +134,8 @@ def get_info():
         return jsonify({"error": "Missing 'url' query parameter."}), 400
 
     try:
-        ydl_opts = {
-            "quiet": True,
-            "no_warnings": True,
-            "skip_download": True,
-        }
+        ydl_opts = get_base_ydl_opts()
+        ydl_opts["skip_download"] = True
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -140,14 +196,13 @@ def download():
     try:
         output_template = os.path.join(temp_dir, "%(title)s.%(ext)s")
 
-        ydl_opts = {
+        ydl_opts = get_base_ydl_opts()
+        ydl_opts.update({
             "format": "bestaudio/best",
             "outtmpl": output_template,
-            "quiet": True,
-            "no_warnings": True,
             "retries": 5,
             "fragment_retries": 5,
-        }
+        })
 
         # Post-process to desired codec (skipped for "original")
         if fmt != "original":
