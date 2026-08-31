@@ -4,7 +4,7 @@
 project:
   name: "YouTube Audio Downloader"
   path: "~/youtube_audio_dwnldr_ext"
-  repo: "https://github.com/yourusername/youtube_audio_dwnldr_ext"  # Update if applicable
+  repo: "https://github.com/coddhisatva/youtube-audio-downloader"
   status: "active"  # Options: active, broken, deprecated, maintenance
   deployed_url: "https://ytaudio-dl.vercel.app"
 
